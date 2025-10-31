@@ -56,16 +56,6 @@ const GalleryPage = () => {
       </Empty>
       <div className="grid grid-cols-2 gap-2 place-items-center ">
         <GalleryCards />
-
-        <GalleryCards />
-
-        <GalleryCards />
-
-        <GalleryCards />
-
-        <GalleryCards />
-
-        <GalleryCards />
       </div>
     </section>
   );

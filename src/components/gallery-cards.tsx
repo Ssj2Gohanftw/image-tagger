@@ -7,7 +7,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 // import Image from "next/image";
-export const GalleryCards = () => {
+
+interface GalleryImage {
+  image: string;
+  description: string;
+}
+export const GalleryCards = ({}) => {
   return (
     <>
       <Card className="w-full max-w-sm ">
