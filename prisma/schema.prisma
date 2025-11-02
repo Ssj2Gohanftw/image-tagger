@@ -80,10 +80,12 @@ model Image {
   url       String
   filename  String
   altText   String?
+  description String?
   tags      Json?
   taggedAt  DateTime @default(now())
   galleryId String   @db.ObjectId
-  gallery   Gallery  @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+  gallery   Gallery  @relation("GalleryImages", fields: [galleryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  coverOf   Gallery? @relation("CoverImage")
 
   @@map("image")
 }
@@ -97,7 +99,9 @@ model Gallery {
   updatedAt   DateTime @updatedAt
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  images      Image[]
+  coverImageId String?  @db.ObjectId @unique
+  coverImage   Image?   @relation("CoverImage", fields: [coverImageId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  images      Image[]   @relation("GalleryImages")
 
   @@map("gallery")
 }

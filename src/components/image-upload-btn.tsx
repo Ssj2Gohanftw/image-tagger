@@ -8,12 +8,35 @@ import {
 } from "./kibo-ui/dropzone";
 export const ImageUploadBtn = () => {
   const [files, setFiles] = useState<File[] | undefined>();
-  const handleDrop = (files: File[]) => {
-    console.log(files);
-    files.forEach((file) => {
-      toast.success(`${file.name} uploaded to Gallery!`);
-    });
-    setFiles(files);
+  const [uploading, setUploading] = useState(false);
+
+  const handleDrop = async (incoming: File[]) => {
+    setFiles(incoming);
+    if (!incoming?.length) return;
+    setUploading(true);
+    try {
+      for (const file of incoming) {
+        const form = new FormData();
+        form.append("file", file);
+        const res = await fetch("/api/upload", { method: "POST", body: form });
+        if (!res.ok) {
+          const msg = await res.text().catch(() => "");
+          if (res.status === 401) {
+            toast.error("Please sign in to upload images.");
+          } else {
+            toast.error(`Failed to upload ${file.name}`);
+          }
+          console.error("Upload failed:", res.status, msg);
+          continue;
+        }
+        await res.json().catch(() => ({}) as unknown);
+        toast.success(`${file.name} uploaded`);
+      }
+      // Notify listeners to refresh albums once uploads complete
+      window.dispatchEvent(new CustomEvent("albums:refresh"));
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -26,6 +49,8 @@ export const ImageUploadBtn = () => {
         onDrop={handleDrop}
         onError={console.error}
         src={files}
+        className="cursor-pointer"
+        disabled={uploading}
       >
         <DropzoneEmptyState />
         <DropzoneContent />
